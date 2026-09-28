@@ -1,0 +1,196 @@
+# MySql Flexible Server
+
+This terraform module streamlines the creation and management of azure mysql flexible servers. It provides a flexible and customizable solution for deploying fully-configured instances, incorporating best practices and offering a variety of options to suit different needs.
+
+## Features
+
+Manages multiple databases
+
+Support for multiple firewall rules
+
+Utilization of terratest for robust validation.
+
+Provides maintenance, high availability, and robust management options.
+
+Ability to generate a user assigned identity or bring your own if specified.
+
+Flexible configuration of multiple server parameters
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+The following requirements are needed by this module:
+
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.0)
+
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 5.0)
+
+## Providers
+
+The following providers are used by this module:
+
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (5.4.0)
+
+## Resources
+
+The following resources are used by this module:
+
+- [azurerm_mysql_flexible_database.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mysql_flexible_database) (resource)
+- [azurerm_mysql_flexible_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mysql_flexible_server) (resource)
+- [azurerm_mysql_flexible_server_configuration.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mysql_flexible_server_configuration) (resource)
+- [azurerm_mysql_flexible_server_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mysql_flexible_server_firewall_rule) (resource)
+
+## Required Inputs
+
+The following input variables are required:
+
+### <a name="input_mysql_flexible_server"></a> [mysql\_flexible\_server](#input\_mysql\_flexible\_server)
+
+Description: Contains all mysql flexible server configuration
+
+Type:
+
+```hcl
+object({
+    name                              = string
+    resource_group_name               = optional(string)
+    location                          = optional(string)
+    backup_retention_days             = optional(number)
+    create_mode                       = optional(string)
+    delegated_subnet_id               = optional(string)
+    geo_redundant_backup_enabled      = optional(bool)
+    point_in_time_restore_time_in_utc = optional(string)
+    private_dns_zone_id               = optional(string)
+    replication_role                  = optional(string)
+    sku_name                          = optional(string)
+    source_server_id                  = optional(string)
+    version                           = optional(string)
+    zone                              = optional(string)
+    administrator_login               = optional(string)
+    administrator_password            = optional(string)
+    administrator_password_wo         = optional(string)
+    administrator_password_wo_version = optional(number)
+    public_network_access             = optional(string)
+    tags                              = optional(map(string))
+    identity = optional(object({
+      type         = string
+      identity_ids = optional(list(string))
+    }), null)
+    storage = optional(object({
+      iops                = optional(number)
+      size_gb             = optional(number)
+      auto_grow_enabled   = optional(bool)
+      io_scaling_enabled  = optional(bool)
+      log_on_disk_enabled = optional(bool)
+    }), null)
+    high_availability = optional(object({
+      mode                      = string
+      standby_availability_zone = optional(string)
+    }), null)
+    maintenance_window = optional(object({
+      start_hour   = optional(number)
+      start_minute = optional(number)
+      day_of_week  = optional(number)
+    }), null)
+    customer_managed_key = optional(object({
+      key_vault_key_id                     = optional(string)
+      geo_backup_key_vault_key_id          = optional(string)
+      primary_user_assigned_identity_id    = optional(string)
+      geo_backup_user_assigned_identity_id = optional(string)
+    }), null)
+    databases = optional(map(object({
+      name      = optional(string)
+      collation = string
+      charset   = string
+    })), {})
+    firewall_rules = optional(map(object({
+      name             = optional(string)
+      start_ip_address = string
+      end_ip_address   = string
+    })), {})
+    configurations = optional(map(object({
+      name  = string
+      value = string
+    })), {})
+  })
+```
+
+## Optional Inputs
+
+The following input variables are optional (have default values):
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: default azure region to be used.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
+
+Description: default resource group to be used.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_tags"></a> [tags](#input\_tags)
+
+Description: tags to be added to the resources
+
+Type: `map(string)`
+
+Default: `{}`
+
+## Outputs
+
+The following outputs are exported:
+
+### <a name="output_configurations"></a> [configurations](#output\_configurations)
+
+Description: Contains all mysql flexible server configurations
+
+### <a name="output_databases"></a> [databases](#output\_databases)
+
+Description: Contains all mysql flexible server databases
+
+### <a name="output_firewall_rules"></a> [firewall\_rules](#output\_firewall\_rules)
+
+Description: Contains all mysql flexible server firewall rules
+
+### <a name="output_mysql_flexible_server"></a> [mysql\_flexible\_server](#output\_mysql\_flexible\_server)
+
+Description: Contains all mysql flexible server configuration
+<!-- END_TF_DOCS -->
+
+## Goals
+
+For more information, please see our [goals and non-goals](./GOALS.md).
+
+## Testing
+
+For more information, please see our testing [guidelines](./TESTING.md)
+
+## Notes
+
+Using a dedicated module, we've developed a naming convention for resources that's based on specific regular expressions for each type, ensuring correct abbreviations and offering flexibility with multiple prefixes and suffixes.
+
+Full examples detailing all usages, along with integrations with dependency modules, are located in the examples directory.
+
+To update the module's documentation run `make doc`
+
+## Contributors
+
+We welcome contributions from the community! Whether it's reporting a bug, suggesting a new feature, or submitting a pull request, your input is highly valued.
+
+For more information, please see our contribution [guidelines](./CONTRIBUTING.md).
+
+## License
+
+MIT Licensed. See [LICENSE](https://github.com/cloudnationhq/terraform-azure-mysql/blob/main/LICENSE) for full details.
+
+## References
+
+- [Documentation](https://learn.microsoft.com/en-us/azure/mysql/flexible-server/overview)
+- [Rest Api](https://learn.microsoft.com/en-us/rest/api/mysql/)
